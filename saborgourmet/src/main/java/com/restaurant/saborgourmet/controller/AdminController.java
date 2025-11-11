@@ -14,10 +14,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
-/**
- * Controlador de Administración
- * RF16: Gestión de Usuarios
- */
 @Controller
 @RequestMapping("/admin")
 @RequiredArgsConstructor
@@ -139,6 +135,7 @@ public class AdminController {
         return "redirect:/admin/usuarios";
     }
 
+
     @PostMapping("/usuarios/eliminar/{id}")
     public String eliminarUsuario(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
@@ -147,7 +144,7 @@ public class AdminController {
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        
+
         return "redirect:/admin/usuarios";
     }
 }

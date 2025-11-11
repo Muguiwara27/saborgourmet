@@ -98,11 +98,10 @@ public class UsuarioServiceImpl implements UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-        // Eliminación lógica (cambiar estado a inactivo)
-        usuario.setEstado(false);
-        usuarioRepository.save(usuario);
+        // Eliminación física (eliminar completamente el registro)
+        usuarioRepository.delete(usuario);
 
-        log.info("Usuario desactivado exitosamente: {}", usuario.getNombreUsuario());
+        log.info("Usuario eliminado permanentemente: {}", usuario.getNombreUsuario());
     }
 
     @Override

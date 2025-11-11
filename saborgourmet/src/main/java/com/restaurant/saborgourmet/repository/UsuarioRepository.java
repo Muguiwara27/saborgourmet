@@ -13,28 +13,20 @@ import java.util.Optional;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
-
     Optional<Usuario> findByNombreUsuario(String nombreUsuario);
-
 
     boolean existsByNombreUsuario(String nombreUsuario);
 
-
     List<Usuario> findByRol(Usuario.Rol rol);
-
 
     List<Usuario> findByEstado(Boolean estado);
 
-
     List<Usuario> findByRolAndEstado(Usuario.Rol rol, Boolean estado);
-
 
     @Query("SELECT u FROM Usuario u WHERE u.estado = true ORDER BY u.nombreUsuario")
     List<Usuario> findAllActiveUsers();
 
-
     long countByRol(Usuario.Rol rol);
-
 
     @Query("SELECT u FROM Usuario u WHERE LOWER(u.nombreUsuario) LIKE LOWER(CONCAT('%', :nombre, '%'))")
     List<Usuario> searchByNombreUsuario(@Param("nombre") String nombre);

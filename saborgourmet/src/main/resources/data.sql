@@ -1,29 +1,19 @@
--- Datos de Prueba - Usuarios con Contraseñas Cifradas (BCrypt strength 12)
--- Contraseñas originales:
--- admin: Admin123
--- mozo1: Mozo123
--- cajero1: Cajero123
--- cocinero1: Cocinero123
+-- Usuarios de prueba con contraseñas ENCRIPTADAS con BCrypt (fuerza 12)
+-- Contraseñas en texto plano:
+-- admin / password123 (Administrador)
+-- mozo1 / Mozo123 (Mozo)
+-- cajero1 / Cajero123 (Cajero)
+-- cocinero1 / Cocinero123 (Cocinero)
 
--- Usuario ADMIN
-INSERT INTO usuario (nombre_usuario, contrasena, rol, estado) VALUES 
-('admin', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIR.ub4W8m', 'ADMIN', TRUE);
+-- Eliminar usuarios existentes (opcional)
+-- DELETE FROM usuario;
 
--- Usuario MOZO
-INSERT INTO usuario (nombre_usuario, contrasena, rol, estado) VALUES 
-('mozo1', '$2a$12$8Z8qZ8qZ8qZ8qZ8qZ8qZ8uKX8Z8qZ8qZ8qZ8qZ8qZ8qZ8qZ8qZ8qZ', 'MOZO', TRUE);
+-- Insertar usuarios
+INSERT INTO usuario (nombre_usuario, contrasena, rol, estado, fecha_creacion, fecha_modificacion) VALUES
+    ('admin', '$2a$12$V1U0fksEtAcWvCbhG9Et6utnkJMCipPtyNmkLS8ajJJ1dQPXMb8zS', 'ADMIN', true, NOW(), NOW()),
+    ('mozo1', '$2a$12$TDo3PMPtJo4vs7j8Sz7hsu2Z1ktL/Jri2WsBDcKTHiRm7pOxEuJbO', 'MOZO', true, NOW(), NOW()),
+    ('cocinero1', '$2a$12$zyYfzswg9alzFoKD5mRIG.pMfGtfk/4SZvR6cPwb0hZ95ftHq1SeS', 'COCINERO', true, NOW(), NOW()),
+    ('cajero1', '$2a$12$/u.TWnIE9TGeFyH8xW5FWuFzBlN2vQKia2rOhx3s.UDAxK3Iuz4ny', 'CAJERO', true, NOW(), NOW());
 
--- Usuario CAJERO
-INSERT INTO usuario (nombre_usuario, contrasena, rol, estado) VALUES 
-('cajero1', '$2a$12$9A9qA9qA9qA9qA9qA9qA9uLY9A9qA9qA9qA9qA9qA9qA9qA9qA9qA', 'CAJERO', TRUE);
-
--- Usuario COCINERO
-INSERT INTO usuario (nombre_usuario, contrasena, rol, estado) VALUES 
-('cocinero1', '$2a$12$7B7qB7qB7qB7qB7qB7qB7uMZ7B7qB7qB7qB7qB7qB7qB7qB7qB7qB', 'COCINERO', TRUE);
-
--- Registros iniciales en bitácora
-INSERT INTO bitacora (id_usuario, accion, tabla_afectada, registro_id, ip_address, detalles) VALUES
-(1, 'CREAR', 'usuario', 1, '127.0.0.1', 'Usuario administrador creado en inicialización del sistema'),
-(1, 'CREAR', 'usuario', 2, '127.0.0.1', 'Usuario mozo1 creado en inicialización del sistema'),
-(1, 'CREAR', 'usuario', 3, '127.0.0.1', 'Usuario cajero1 creado en inicialización del sistema'),
-(1, 'CREAR', 'usuario', 4, '127.0.0.1', 'Usuario cocinero1 creado en inicialización del sistema');
+-- Verificar usuarios insertados
+-- SELECT nombre_usuario, rol, estado FROM usuario;
