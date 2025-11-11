@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitácora del Sistema - Sabor Gourmet</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2><i class="bi bi-journal-text"></i> Bitácora del Sistema</h2>
+                <p class="text-muted">Registro de auditoría de todas las operaciones del sistema</p>
+            </div>
+        </div>
+        
+        <!-- Filtros -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" action="/bitacora">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Usuario</label>
+                            <select name="usuarioId" class="form-select">
+                                <option value="">Todos</option>
+                                <option th:each="u : ${usuarios}" 
+                                        th:value="${u.idUsuario}" 
+                                        th:text="${u.nombreUsuario}"
+                                        th:selected="${usuarioId == u.idUsuario}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Tabla</label>
+                            <input type="text" name="tabla" class="form-control" 
+                                   placeholder="Ej: usuario" th:value="${tabla}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Acción</label>
+                            <select name="accion" class="form-select" th:value="${accion}">
+                                <option value="">Todas</option>
+                                <option value="CREAR">CREAR</option>
+                                <option value="ACTUALIZAR">ACTUALIZAR</option>
+                                <option value="ELIMINAR">ELIMINAR</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="bi bi-search"></i> Filtrar
+                            </button>
+                            <a href="/bitacora" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Limpiar
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Tabla de bitácora -->
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha/Hora</th>
+                                <th>Usuario</th>
+                                <th>Acción</th>
+                                <th>Tabla</th>
+                                <th>Registro ID</th>
+                                <th>IP</th>
+                                <th>Detalles</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="registro : ${bitacoraPage.content}">
+                                <td th:text="${registro.idBitacora}"></td>
+                                <td th:text="${#temporals.format(registro.fechaHora, 'dd/MM/yyyy HH:mm:ss')}"></td>
+                                <td>
+                                    <span th:if="${registro.usuario != null}" 
+                                          th:text="${registro.usuario.nombreUsuario}"></span>
+                                    <span th:unless="${registro.usuario != null}" class="text-muted">SYSTEM</span>
+                                </td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${registro.accion == 'CREAR'} ? 'bg-success' : 
+                                                         (${registro.accion == 'ACTUALIZAR'} ? 'bg-warning' : 'bg-danger')"
+                                          th:text="${registro.accion}">
+                                    </span>
+                                </td>
+                                <td>
+                                    <code th:text="${registro.tablaAfectada}"></code>
+                                </td>
+                                <td th:text="${registro.registroId}"></td>
+                                <td>
+                                    <small th:text="${registro.ipAddress}"></small>
+                                </td>
+                                <td>
+                                    <small class="text-muted" th:text="${registro.detalles}"></small>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Paginación -->
+                <nav th:if="${bitacoraPage.totalPages > 1}">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link" th:href="@{/bitacora(page=${currentPage - 1}, size=20)}">Anterior</a>
+                        </li>
+                        
+                        <li class="page-item" 
+                            th:each="i : ${#numbers.sequence(0, bitacoraPage.totalPages - 1)}"
+                            th:classappend="${i == currentPage} ? 'active'">
+                            <a class="page-link" th:href="@{/bitacora(page=${i}, size=20)}" th:text="${i + 1}"></a>
+                        </li>
+                        
+                        <li class="page-item" th:classappend="${currentPage == bitacoraPage.totalPages - 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/bitacora(page=${currentPage + 1}, size=20)}">Siguiente</a>
+                        </li>
+                    </ul>
+                    <p class="text-center text-muted">
+                        Mostrando <strong th:text="${bitacoraPage.numberOfElements}"></strong> de 
+                        <strong th:text="${totalItems}"></strong> registros
+                    </p>
+                </nav>
+                
+                <div th:if="${#lists.isEmpty(bitacoraPage.content)}" class="text-center py-4">
+                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                    <p class="text-muted">No hay registros en la bitácora</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

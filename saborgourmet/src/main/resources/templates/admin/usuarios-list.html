@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios - Sabor Gourmet</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <div class="container mt-4">
+        <!-- Título y botón nuevo -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h2><i class="bi bi-people-fill"></i> Gestión de Usuarios</h2>
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="/admin/usuarios/nuevo" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Nuevo Usuario
+                </a>
+            </div>
+        </div>
+        
+        <!-- Mensajes -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle-fill"></i> <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle-fill"></i> <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <!-- Filtros -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" action="/admin/usuarios">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Rol</label>
+                            <select name="rol" class="form-select">
+                                <option value="">Todos</option>
+                                <option th:each="r : ${roles}" th:value="${r}" th:text="${r.descripcion}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Estado</label>
+                            <select name="estado" class="form-select">
+                                <option value="">Todos</option>
+                                <option value="true">Activos</option>
+                                <option value="false">Inactivos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="bi bi-search"></i> Filtrar
+                            </button>
+                            <a href="/admin/usuarios" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Limpiar
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Tabla de usuarios -->
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Usuario</th>
+                                <th>Rol</th>
+                                <th>Estado</th>
+                                <th>Fecha Creación</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="usuario : ${usuarios}">
+                                <td th:text="${usuario.idUsuario}"></td>
+                                <td>
+                                    <i class="bi bi-person-circle"></i>
+                                    <span th:text="${usuario.nombreUsuario}"></span>
+                                </td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${usuario.rol.name() == 'ADMIN'} ? 'bg-danger' : 
+                                                         (${usuario.rol.name() == 'MOZO'} ? 'bg-info' : 
+                                                         (${usuario.rol.name() == 'CAJERO'} ? 'bg-success' : 'bg-warning'))"
+                                          th:text="${usuario.rol.descripcion}">
+                                    </span>
+                                </td>
+                                <td>
+                                    <span th:if="${usuario.estado}" class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Activo
+                                    </span>
+                                    <span th:unless="${usuario.estado}" class="badge bg-secondary">
+                                        <i class="bi bi-x-circle"></i> Inactivo
+                                    </span>
+                                </td>
+                                <td th:text="${#temporals.format(usuario.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <a th:href="@{/admin/usuarios/editar/{id}(id=${usuario.idUsuario})}" 
+                                       class="btn btn-sm btn-warning" title="Editar">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    
+                                    <form th:action="@{/admin/usuarios/cambiar-estado/{id}(id=${usuario.idUsuario})}" 
+                                          method="post" style="display: inline;">
+                                        <input type="hidden" name="estado" th:value="${!usuario.estado}">
+                                        <button type="submit" 
+                                                th:class="${usuario.estado} ? 'btn btn-sm btn-secondary' : 'btn btn-sm btn-success'"
+                                                th:title="${usuario.estado} ? 'Desactivar' : 'Activar'">
+                                            <i th:class="${usuario.estado} ? 'bi bi-toggle-off' : 'bi bi-toggle-on'"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div th:if="${#lists.isEmpty(usuarios)}" class="text-center py-4">
+                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                    <p class="text-muted">No hay usuarios registrados</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
